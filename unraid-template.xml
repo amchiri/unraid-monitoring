@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>unraid-monitoring</Name>
+  <Repository>amchiri/unraid-monitoring</Repository>
+  <Registry>https://hub.docker.com/r/amchiri/unraid-monitoring</Registry>
+  <Network>bridge</Network>
+  <Shell>sh</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/amchiri/unraid-monitoring/issues</Support>
+  <Project>https://github.com/amchiri/unraid-monitoring</Project>
+  <Overview>Dashboard de monitoring pour serveur Unraid. Expose les métriques système, Docker, disques, partages et plus via une API REST, avec un dashboard web responsive et installable en PWA. Consomme l'API GraphQL locale d'Unraid.</Overview>
+  <Category>Tools: Status:</Category>
+  <WebUI>http://[IP]:[PORT:3000]/</WebUI>
+  <Icon>https://raw.githubusercontent.com/amchiri/unraid-monitoring/main/public/icon-192.png</Icon>
+  <ExtraParams/>
+  <PostArgs/>
+  <CPUset/>
+  <DonateText/>
+  <DonateLink/>
+
+  <!-- Port du dashboard -->
+  <Config
+    Name="Port WebUI"
+    Target="3000"
+    Default="3000"
+    Mode="tcp"
+    Description="Port d'écoute du dashboard web et de l'API REST."
+    Type="Port"
+    Display="always"
+    Required="true"
+    Mask="false">3000</Config>
+
+  <!-- Variables d'environnement obligatoires -->
+  <Config
+    Name="URL GraphQL Unraid"
+    Target="UNRAID_GRAPHQL_URL"
+    Default="http://192.168.1.1/graphql"
+    Description="URL de l'API GraphQL interne d'Unraid. Remplacer 192.168.1.1 par l'IP LAN du serveur Unraid."
+    Type="Variable"
+    Display="always"
+    Required="true"
+    Mask="false">http://192.168.1.1/graphql</Config>
+
+  <Config
+    Name="Clé API Unraid"
+    Target="UNRAID_API_KEY"
+    Default=""
+    Description="Clé API Unraid (en-tête x-api-key). Disponible dans Settings > Management Access > API Keys sur l'interface Unraid."
+    Type="Variable"
+    Display="always"
+    Required="true"
+    Mask="true"></Config>
+
+  <!-- Variables optionnelles -->
+  <Config
+    Name="Token d'accès API (optionnel)"
+    Target="API_TOKEN"
+    Default=""
+    Description="Si défini, tous les appels à /api/* exigent l'en-tête Authorization: Bearer &lt;token&gt;. Recommandé si le port est exposé hors du LAN."
+    Type="Variable"
+    Display="always"
+    Required="false"
+    Mask="true"></Config>
+
+  <Config
+    Name="Désactiver le terminal"
+    Target="TERMINAL_DISABLED"
+    Default="0"
+    Description="Mettre à 1 pour désactiver le terminal WebSocket interactif (/api/terminal). Recommandé si API_TOKEN n'est pas défini et que le port est exposé publiquement."
+    Type="Variable"
+    Display="always"
+    Required="false"
+    Mask="false">0</Config>
+
+  <Config
+    Name="Dossier de départ du terminal"
+    Target="TERMINAL_CWD"
+    Default="/mnt/user"
+    Description="Répertoire de travail initial du terminal interactif."
+    Type="Variable"
+    Display="advanced"
+    Required="false"
+    Mask="false">/mnt/user</Config>
+
+</Container>
