@@ -1,0 +1,80 @@
+@import 'tailwindcss';
+
+:root {
+  color-scheme: dark;
+  --accent: #38bdf8;
+  --accent-glow: rgba(56, 189, 248, 0.15);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: #050507;
+  background-image: 
+    radial-gradient(circle at 50% -20%, #1e1b4b 0%, transparent 50%),
+    radial-gradient(circle at 0% 0%, #0f172a 0%, transparent 30%),
+    radial-gradient(circle at 100% 100%, #0c0a09 0%, transparent 30%);
+  background-attachment: fixed;
+  color: #f4f4f5;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  letter-spacing: -0.01em;
+}
+
+/* Défilement tactile fluide (iOS) */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Bande défilable sans scrollbar visible (stats de l'en-tête sur mobile) */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* PWA plein écran : marge basse pour la barre d'accueil iOS (home indicator) */
+.app-shell {
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-top: env(safe-area-inset-top);
+}
+
+/* En mode standalone iOS avec barre de statut translucide, on ajoute un padding en haut */
+:root.is-standalone .app-shell {
+  padding-top: calc(env(safe-area-inset-top) + 10px);
+}
+
+/* Scrollbar discrète et moderne */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 10px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Effet de brillance subtil sur les cartes */
+.glass-card {
+  background: rgba(18, 18, 22, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+}
+
+.glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+}
