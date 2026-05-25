@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { api } from '../lib/api'
 import { usePoll } from '../lib/usePoll'
-import { Card, Gauge, Sparkline, ErrorNote, Stat, Skeleton } from './ui'
+import { Card, Gauge, Sparkline, ErrorNote, Skeleton } from './ui'
 import { formatBytes, temp } from '../lib/format'
 import { Activity } from 'lucide-react'
 
