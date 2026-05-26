@@ -1,6 +1,7 @@
 import { WebSocketServer } from 'ws'
 import { spawn, execFile } from 'node:child_process'
 import { readlinkSync, readFileSync, readdirSync, existsSync } from 'node:fs'
+import { HOST_ACCESS, systemShellExec, dockerConsoleExec } from './host.js'
 
 // ---------------------------------------------------------------------------
 // Terminal interactif (vrai PTY) sans module natif.
@@ -87,13 +88,17 @@ function hookShutdown() {
 }
 
 function spawnShell(cols, rows, containerName) {
+  // Taille initiale appliquée avant de céder la main au shell/conteneur.
+  const stty = `stty rows ${rows} cols ${cols} 2>/dev/null; `
   let startup, cwd
   if (containerName) {
-    startup = `stty rows ${rows} cols ${cols} 2>/dev/null; exec docker exec -it ${containerName} sh`
+    startup = stty + dockerConsoleExec(containerName)
     cwd = '/'
   } else {
-    startup = `stty rows ${rows} cols ${cols} 2>/dev/null; exec bash -l`
-    cwd = startDir()
+    startup = stty + systemShellExec()
+    // En mode hôte, le cwd cible (/mnt/user) n'existe pas dans le conteneur :
+    // on démarre `script` à la racine du conteneur, le `cd` se fait après nsenter.
+    cwd = HOST_ACCESS ? '/' : startDir()
   }
   const child = spawn('script', ['-qfc', startup, '/dev/null'], {
     cwd,

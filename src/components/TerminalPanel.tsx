@@ -5,6 +5,7 @@ import '@xterm/xterm/css/xterm.css'
 import { Card, Dot, Btn } from './ui'
 import { TerminalSquare } from 'lucide-react'
 import type { Container } from '../lib/api'
+import { getToken } from '../lib/auth'
 
 type Status = 'connecting' | 'connected' | 'disconnected'
 
@@ -20,8 +21,13 @@ const THEME = {
 function buildWsUrl(containerName?: string) {
   const proto = location.protocol === 'https:' ? 'wss' : 'ws'
   const base = `${proto}://${location.host}/api/terminal`
-  if (containerName) return `${base}?container=${encodeURIComponent(containerName)}`
-  return base
+  const params = new URLSearchParams()
+  if (containerName) params.set('container', containerName)
+  // Un navigateur ne peut pas poser d'en-tête sur un WebSocket : token en query.
+  const token = getToken()
+  if (token) params.set('token', token)
+  const qs = params.toString()
+  return qs ? `${base}?${qs}` : base
 }
 
 export function TerminalPanel({

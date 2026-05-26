@@ -5,14 +5,17 @@
   <Registry>https://hub.docker.com/r/amchiri/unraid-monitoring</Registry>
   <Network>bridge</Network>
   <Shell>sh</Shell>
-  <Privileged>false</Privileged>
+  <Privileged>true</Privileged>
   <Support>https://github.com/amchiri/unraid-monitoring/issues</Support>
   <Project>https://github.com/amchiri/unraid-monitoring</Project>
   <Overview>Dashboard de monitoring pour serveur Unraid. Expose les métriques système, Docker, disques, partages et plus via une API REST, avec un dashboard web responsive et installable en PWA. Consomme l'API GraphQL locale d'Unraid.</Overview>
   <Category>Tools: Status:</Category>
   <WebUI>http://[IP]:[PORT:3000]/</WebUI>
   <Icon>https://raw.githubusercontent.com/amchiri/unraid-monitoring/main/public/icon-192.png</Icon>
-  <ExtraParams/>
+  <!-- --pid=host : partage le PID namespace de l'hôte, requis (avec le mode
+       privilégié) pour que nsenter -t 1 saute sur le shell root de l'hôte
+       (terminal système, consoles Docker, syslog). Voir HOST_ACCESS. -->
+  <ExtraParams>--pid=host</ExtraParams>
   <PostArgs/>
   <CPUset/>
   <DonateText/>
@@ -81,5 +84,15 @@
     Display="advanced"
     Required="false"
     Mask="false">/mnt/user</Config>
+
+  <Config
+    Name="Accès à l'hôte (terminal/console/syslog)"
+    Target="HOST_ACCESS"
+    Default="1"
+    Description="Mettre à 1 pour que le terminal, les consoles Docker, les logs et le syslog s'exécutent sur le VRAI hôte Unraid (via nsenter). Exige le mode privilégié + --pid=host (déjà réglés dans ce template). ⚠ Donne un accès root complet à l'hôte depuis le navigateur : à n'activer qu'avec un Token d'accès API défini. Mettre à 0 pour rester confiné au conteneur."
+    Type="Variable"
+    Display="always"
+    Required="false"
+    Mask="false">1</Config>
 
 </Container>

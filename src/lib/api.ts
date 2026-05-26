@@ -1,7 +1,18 @@
+import { getToken, markAuthRequired } from './auth'
+
 const BASE = '/api'
 
+function authHeaders(): Record<string, string> {
+  const t = getToken()
+  return t ? { Authorization: `Bearer ${t}` } : {}
+}
+
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`)
+  const res = await fetch(`${BASE}${path}`, { headers: authHeaders() })
+  if (res.status === 401) {
+    markAuthRequired()
+    throw new Error('Token d’accès requis')
+  }
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
     throw new Error(body.error || `HTTP ${res.status}`)
@@ -10,7 +21,11 @@ async function get<T>(path: string): Promise<T> {
 }
 
 async function post<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, { method: 'POST' })
+  const res = await fetch(`${BASE}${path}`, { method: 'POST', headers: authHeaders() })
+  if (res.status === 401) {
+    markAuthRequired()
+    throw new Error('Token d’accès requis')
+  }
   const body = await res.json().catch(() => ({}))
   if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`)
   return body

@@ -14,10 +14,12 @@ import { UpsPanel } from './components/UpsPanel'
 import { NotificationsPanel } from './components/NotificationsPanel'
 import { TerminalPanel } from './components/TerminalPanel'
 import { SyslogPanel } from './components/SyslogPanel'
+import { TokenGate } from './components/TokenGate'
+import { useAuthRequired } from './lib/auth'
 import { temp } from './lib/format'
 import { motion, AnimatePresence } from 'framer-motion'
 
-import { Server, Leaf } from 'lucide-react'
+import { Server, Leaf, KeyRound } from 'lucide-react'
 
 function StatPill({ label, value, tone }: { label: string; value: string; tone?: 'warn' | 'bad' }) {
   const color = tone === 'bad' ? 'text-rose-400' : tone === 'warn' ? 'text-amber-400' : 'text-white'
@@ -37,6 +39,8 @@ export default function App() {
   const cpu = m?.cpuPercent
   const mem = m?.memPercent
 
+  const needsAuth = useAuthRequired()
+  const [showToken, setShowToken] = useState(false)
   const [dockerConsole, setDockerConsole] = useState<Container | null>(null)
   const [dockerLogs, setDockerLogs] = useState<Container | null>(null)
   const terminalRef = useRef<HTMLDivElement>(null)
@@ -138,9 +142,20 @@ export default function App() {
         </AnimatePresence>
       </main>
 
-      <footer className="mt-8 text-center text-[11px] font-medium tracking-wide text-zinc-600 uppercase">
-        Unraid Dashboard · données rafraîchies automatiquement · {data?.fetchedAt ? new Date(data.fetchedAt).toLocaleTimeString('fr-FR') : ''}
+      <footer className="mt-8 flex items-center justify-center gap-2 text-center text-[11px] font-medium tracking-wide text-zinc-600 uppercase">
+        <span>Unraid Dashboard · données rafraîchies automatiquement · {data?.fetchedAt ? new Date(data.fetchedAt).toLocaleTimeString('fr-FR') : ''}</span>
+        <button
+          onClick={() => setShowToken(true)}
+          title="Token d’accès API"
+          className="inline-flex items-center gap-1 text-zinc-600 transition-colors hover:text-zinc-400"
+        >
+          <KeyRound size={12} /> token
+        </button>
       </footer>
+
+      {(needsAuth || showToken) && (
+        <TokenGate forced={needsAuth} onClose={() => setShowToken(false)} />
+      )}
     </div>
   )
 }

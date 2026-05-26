@@ -446,14 +446,19 @@ router.post('/vms/:id/:action', async (req, res, next) => {
 })
 
 // ... at the end of the file, before export default router
-import { exec, execFile } from 'child_process'
+import { execFile } from 'child_process'
 import { promisify } from 'util'
-const execAsync = promisify(exec)
+import { hostArgv } from './host.js'
 const execFileAsync = promisify(execFile)
 
 router.get('/syslog', async (req, res, next) => {
   try {
-    const { stdout } = await execAsync('tail -n 50 /var/log/syslog')
+    // hostArgv : sur l'hôte via nsenter si HOST_ACCESS (le syslog vit côté hôte).
+    const [file, args] = hostArgv('tail', ['-n', '50', '/var/log/syslog'])
+    const { stdout } = await execFileAsync(file, args, {
+      encoding: 'utf8',
+      maxBuffer: 2 * 1024 * 1024,
+    })
     res.json({ logs: stdout })
   } catch (e) {
     // Si on n'est pas sur Unraid ou pas root, on renvoie une erreur ou un mock
@@ -467,10 +472,12 @@ router.get('/docker/:name/logs', async (req, res) => {
     return res.status(400).json({ error: 'Nom de conteneur invalide' })
   }
   try {
-    const { stdout, stderr } = await execFileAsync(
-      'docker', ['logs', '--tail', '200', name],
-      { encoding: 'utf8', maxBuffer: 2 * 1024 * 1024 },
-    )
+    // hostArgv : `docker` de l'hôte via nsenter si HOST_ACCESS.
+    const [file, args] = hostArgv('docker', ['logs', '--tail', '200', name])
+    const { stdout, stderr } = await execFileAsync(file, args, {
+      encoding: 'utf8',
+      maxBuffer: 2 * 1024 * 1024,
+    })
     res.json({ logs: (stdout + stderr) || '(aucun log)' })
   } catch (e) {
     res.json({ logs: 'Erreur : ' + (e.stderr || e.message) })
